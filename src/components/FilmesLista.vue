@@ -9,11 +9,20 @@
                 :filme="filme"
                 :class="aplicaClasseActiva(filme)"
                 @filmeEscolhido="filmeSelecionado = $event"
-                />
+            />
             </ul>
         </div>
          <div class="col-4">
-            <FilmesListaInfo :filmeSelecionado="filmeSelecionado"/>
+            <FilmesListaInfo
+                v-if="!editar"
+                :filmeSelecionado="filmeSelecionado"
+                @editarFilme="editarFilme"
+            />
+
+            <FilmesListaItenEditar 
+                v-else
+                :filme="filmeSelecionado"
+            />
         </div> 
     </div>
 </template>
@@ -21,12 +30,14 @@
 <script>
 
 import FilmesListaItens from './FilmesListaIten'
+import FilmesListaItenEditar from './FilmesListaItenEditar'
 import FilmesListaInfo from './FilmesListaItenInfo'
 import {eventBus} from './../main'
 
 export default {
     components: {
         FilmesListaItens,
+        FilmesListaItenEditar,
         FilmesListaInfo
     },
     data(){
@@ -53,7 +64,8 @@ export default {
                     ano: 2019
                 }
             ],
-            filmeSelecionado: undefined
+            filmeSelecionado: undefined,
+            editar: false
         }
     },
     methods: {
@@ -61,12 +73,23 @@ export default {
             return {
                 active: this.filmeSelecionado && this.filmeSelecionado.id === filmeItem.id
             }
+        },
+        editarFilme(){
+            this.editar = true;
+        },
+        atualizarFilme(filmeAtualizado){
+            const indice = this.listaFilmes.findIndex(filme => filme.id === filmeAtualizado.id);
+            this.listaFilmes.splice(indice, 1, filmeAtualizado);
+            this.editar = false;
+            this.filmeSelecionado = undefined;
         }
     },
     created(){
         eventBus.$on("filmeSelecionado", (filme) => {
             this.filmeSelecionado = filme
-        })
+        });
+
+        eventBus.$on("filmeAtualizacao", this.atualizarFilme)
     }
 }
 </script>

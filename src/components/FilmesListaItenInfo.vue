@@ -4,7 +4,7 @@
         <div class="card">
             <div v-if="filme" class="card-body">
                 <h5 class="card-title">{{ filme.titulo }}</h5>
-                <button class="btn btn-danger float-right">Editar</button>
+                <button @click="editarFilme" class="btn btn-danger float-right">Editar</button>
             </div>
             <div v-else class="card-body">
                 <h5 class="card-title">Nenhum filmes Selecionado</h5>
@@ -21,6 +21,11 @@ export default {
     data(){
         return {
             filme: undefined
+        }
+    },
+    methods: {
+        editarFilme(){
+            this.$emit("editarFilme", this.filme)
         }
     },
     created(){
